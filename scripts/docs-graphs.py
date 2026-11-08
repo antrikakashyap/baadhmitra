@@ -84,7 +84,7 @@ fig.tight_layout(); save(fig, "g-gauges.png", "Simulator output (shared/stations
 
 # 5 ---- tests
 by = collections.Counter(); area = collections.Counter()
-names = {"shared.test.ts": "core logic", "gov.test.ts": "roles, SLA, feeds, WhatsApp, offline", "pipeline.test.ts": "Lambda pipeline on a fake AWS", "stack.test.ts": "infrastructure guarantees", "kit.test.ts": "accuracy kit and feed adapter", "filter.test.ts": "dashboard and phone helpers", "csv.test.ts": "dashboard and phone helpers", "queue.test.ts": "dashboard and phone helpers", "pingrule.test.ts": "dashboard and phone helpers", "mfa.test.ts": "dashboard and phone helpers", "properties.test.ts": "property tests (generated inputs)", "villages-import.test.ts": "dashboard and phone helpers", "logic.test.ts": "dashboard and phone helpers"}
+names = {"shared.test.ts": "core logic", "gov.test.ts": "roles, SLA, feeds, WhatsApp, offline", "pipeline.test.ts": "Lambda pipeline on a fake AWS", "stack.test.ts": "infrastructure guarantees", "kit.test.ts": "accuracy kit and feed adapter", "filter.test.ts": "dashboard and phone helpers", "csv.test.ts": "dashboard and phone helpers", "queue.test.ts": "dashboard and phone helpers", "pingrule.test.ts": "dashboard and phone helpers", "mfa.test.ts": "dashboard and phone helpers", "properties.test.ts": "property tests (generated inputs)", "vocab.test.ts": "core logic", "villages-import.test.ts": "dashboard and phone helpers", "logic.test.ts": "dashboard and phone helpers"}
 for f in t["files"]: by[names.get(f["file"], f["file"])] += len(f["tests"])
 fig, ax = plt.subplots(figsize=(10, 4))
 items = sorted(by.items(), key=lambda kv: kv[1]); cols = [C["green"], C["violet"], C["amber"], C["blue"], C["teal"], C["red"]][:len(items)]

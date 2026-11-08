@@ -1,6 +1,6 @@
 import { DeleteCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
-import { TBL, bump, ddb, emf, need, rid, sha, sqs } from './aws'
+import { TBL, bump, ddb, emf, log, need, rid, sha, sqs } from './aws'
 import { redact } from '../../shared/redact'
 
 /** Message that travels through SQS to the extractor. Text is already redacted. */
@@ -81,10 +81,12 @@ export async function accept(raw: string, who: string, pin: Pin | null, now = Da
     // report that never reached the queue and be dropped. Best effort: if this also fails the
     // claim simply expires with its TTL.
     await ddb.send(new DeleteCommand({ TableName: TBL(), Key: { pk: 'K#' + k, sk: 'K' } })).catch(() => emf('DedupeReleaseError', 1))
+    log('error', 'enqueue_failed', { rid: id, err: (err as Error).name })
     throw err
   }
   await bump('reports')
   emf('ReportsIn', 1)
+  log('info', 'report_accepted', { rid: id })
   return { ok: true, id }
 }
 

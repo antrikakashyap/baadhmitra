@@ -137,6 +137,16 @@ export function emf(name: string, value: number, unit = 'Count'): void {
   )
 }
 
+// ---- structured logs ---------------------------------------------------------
+
+/** One JSON line per event. `rid` is the report id, so every step of one report can be found with one CloudWatch query. */
+export function log(level: 'info' | 'warn' | 'error', event: string, f: Record<string, unknown> = {}): void {
+  const line = JSON.stringify({ level, event, ts: new Date().toISOString(), ...f })
+  if (level === 'error') console.error(line)
+  else if (level === 'warn') console.warn(line)
+  else console.log(line)
+}
+
 // ---- http ------------------------------------------------------------------
 
 const H = {

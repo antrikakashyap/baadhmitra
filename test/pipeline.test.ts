@@ -236,6 +236,26 @@ describe('text report -> queue -> extractor -> dispatcher API', async () => {
     expect(pub).toHaveLength(0)
   })
 
+  it('logs one JSON line per step with the report id, and never the message text or phone number', async () => {
+    const lines: string[] = []
+    const spy = vi.spyOn(console, 'log').mockImplementation((x: unknown) => void lines.push(String(x)))
+    const warn = vi.spyOn(console, 'warn').mockImplementation((x: unknown) => void lines.push(String(x)))
+    const err = vi.spyOn(console, 'error').mockImplementation((x: unknown) => void lines.push(String(x)))
+    try {
+      flaky.sqs = 1
+      await expect(ing(ev('/reports', 'POST', { text: 'Kursela me paani chhat par, call 98765 43210', sender: 'lg' }))).rejects.toThrow()
+      await ing(ev('/reports', 'POST', { text: 'Kursela me paani chhat par, call 98765 43210', sender: 'lg' }))
+    } finally {
+      spy.mockRestore()
+      warn.mockRestore()
+      err.mockRestore()
+    }
+    const events = lines.filter((l) => l.startsWith('{"level"')).map((l) => JSON.parse(l))
+    expect(events.map((e) => e.event)).toEqual(expect.arrayContaining(['enqueue_failed', 'report_accepted']))
+    expect(events.every((e) => typeof e.rid === 'string' && e.rid.length > 5)).toBe(true)
+    expect(lines.join('\n')).not.toMatch(/98765|Kursela/)
+  })
+
   it('alerts the ops topic once when an incident first crosses priority 75', async () => {
     const t = 'Khagaria: 25 log phanse hain, paani gardan tak, bachche aur bujurg, naav chahiye'
     for (const u of ['a', 'b', 'c']) await ing(ev('/reports', 'POST', { text: t, sender: u }))

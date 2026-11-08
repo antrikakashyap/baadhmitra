@@ -265,10 +265,10 @@ flowchart LR
 
 ## Tests and evaluation
 
-<p align="center"><img src="docs/assets/g-tests.png" alt="Bar chart of 257 passing tests by area" width="70%"/></p>
+<p align="center"><img src="docs/assets/g-tests.png" alt="Bar chart of 268 passing tests by area" width="70%"/></p>
 
 ```bash
-npm run typecheck && npm test      # 257 tests: core logic, the Lambda pipeline against a fake AWS, the gauge poller, the WhatsApp webhook, voice notes and the extractor with a good, bad or missing model, roles and audit, feeds, offline queue, CDK guarantees, accuracy kit, failure injection and property tests
+npm run typecheck && npm test      # 268 tests: core logic, the Lambda pipeline against a fake AWS, the gauge poller, the WhatsApp webhook, voice notes and the extractor with a good, bad or missing model, roles and audit, feeds, offline queue, CDK guarantees, accuracy kit, failure injection and property tests
 npm run coverage                   # same tests plus a CI gate: 95% lines/functions, 85% branches (now about 98% / 88%)
 npm run eval                       # extractor benchmark (add LLM=1 MODEL=<id> to score Bedrock)
 npx cdk synth                      # validates the CloudFormation template
@@ -394,7 +394,7 @@ If Bedrock access or the model id is wrong, the system keeps working on the rule
 
 ## Where it stands, and where a pilot takes it
 
-BaadhMitra is a working prototype, deployed end to end on AWS and exercised by 257 unit tests and 20 browser tests. This section is the map for judges and for a first district: what is already proven, what needs a partner to prove, and what comes next.
+BaadhMitra is a working prototype, deployed end to end on AWS and exercised by 268 unit tests and 20 browser tests. This section is the map for judges and for a first district: what is already proven, what needs a partner to prove, and what comes next.
 
 ### Proven in the build
 
@@ -403,6 +403,7 @@ BaadhMitra is a working prototype, deployed end to end on AWS and exercised by 2
 - **The whole pipeline runs:** message, redaction, queue, extraction, merge, score, dashboard, dispatch, crew phone, overdue clock, alert. The pipeline tests run it on a fake AWS; the deployed stack runs it for real.
 - **Failures in the middle of a request are tested, not assumed.** Failure-injection tests make the queue, the report write or the alert topic fail halfway. Two real bugs came out of that and are fixed: a failed enqueue used to leave the duplicate marker behind, so the phone's retry was silently dropped as a "duplicate"; and an alert failure after an incident was saved made the queue retry the message and count the report twice. Now the marker is released and the alert failure is only logged.
 - **Invariants are checked on generated inputs.** Property tests (fast-check) run thousands of random report sequences and require: priority always 0 to 100, every report counted once, unique reporters never above reports, severity and needs never shrink, the result independent of arrival order, more reporters never ranks lower, geohash and distance sanity, and redaction that is idempotent and never leaves a mobile number. Breaking the merge or score code on purpose makes them fail.
+- **Traceable:** every step of a report writes one JSON log line carrying the report id (`rid`), never the message text or phone number, so one CloudWatch query follows a report from intake to alert. A test checks both.
 - **CI gates:** coverage thresholds, `npm audit` on shipped dependencies at high severity, required settings (table, queue) that fail at first use instead of running with an empty name, and a synth-time warning when CORS is left open. Open item: the dev tools (vitest, vite) currently carry advisories that only matter on a developer machine; upgrading needs a major version move that is not done yet.
 - **It degrades instead of failing:** Bedrock down means the rule extractor takes over; a network drop means the phone pages queue their taps; a stale river feed is greyed out and raises no alert.
 - **People stay in charge:** the system ranks and recommends, a dispatcher assigns, every action is audited, and a "needs attention" panel and a printable handover sheet keep the control room and the next shift oriented.

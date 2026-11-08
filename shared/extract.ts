@@ -76,12 +76,12 @@ export function check(o: unknown): Rep | null {
 // ---------------------------------------------------------------------------
 
 const K: Record<Need, RegExp> = {
-  boat: /नाव|नौका|\bboats?\b|\bnaa?v\b|\bnauka\b|\bsteamer\b|\bndrf\b|\bsdrf\b/i,
-  food: /खाना|राशन|भोजन|भूख|चूड़ा|अन्न|खाए के|खाय के|खइला|\bfood\b|\bkhana\b|\bration\b|\bbhookh\b|\bhungry\b|\bchura\b/i,
-  water: /पीने का पानी|पेयजल|\bdrinking\b|\bpeene ka (paani|pani)\b|\bclean water\b|\bpaani nahi\b/i,
+  boat: /नाव|नौका|\bboats?\b|\bnaa?[ov]\b|\bnaao\b|\bnaiya\b|\bnauka\b|\bsteamer\b|\bndrf\b|\bsdrf\b/i,
+  food: /खाना|राशन|भोजन|भूख|चूड़ा|अन्न|खाए के|खाय के|खइला|\bfood\b|\bkhana\b|\bration\b|\bbhookh(e|a|i)?\b|\bhungry\b|\bchura\b|\bkhan(e|a)\b|\bkhaane\b|\bdoodh\b|\bmilk\b|\bfood packets?\b|\bstarv/i,
+  water: /पीने का पानी|पेयजल|\bdrinking\b|\bpeene ka (paani|pani)\b|\bclean water\b|\bpaani nahi\b|\bsaf (paani|pani)\b|\bpeene (layak|ke liye)\b|\bpaani peene\b|\bhandpump\b|\bchapakal\b|\bsafe water\b|\bwater packets?\b|\bwater purif/i,
   medical:
-    /दवा|दवाई|दवाइ|अस्पताल|बीमार|बेमार|डागदर|घायल|साँप|सांप|डॉक्टर|\bmedicine\b|\bdawai\b|\bdava\b|\bdoctor\b|\bhospital\b|\bghayal\b|\binjured\b|\bsnake\b|\bsaanp\b|\bfever\b|\bbukhar\b|\bsick\b/i,
-  shelter: /तिरपाल|त्रिपाल|ऊँची जगह|ऊंची जगह|टेंट|\btent\b|\btirpal\b|\bshelter\b|\bunchi jagah\b|\bcamp\b/i,
+    /दवा|दवाई|दवाइ|अस्पताल|बीमार|बेमार|डागदर|घायल|साँप|सांप|डॉक्टर|\bmedicine\b|\bdawai\b|\bdava\b|\bdoctor\b|\bhospital\b|\bghayal\b|\binjured\b|\bsnake\b|\bsaanp\b|\bfever\b|\bbukhar\b|\bsick\b|\bbimaar?\b|\bbeemaar\b|\bmareez\b|\bambulance\b|\bsaans\b|\bbehosh\b|\bdard\b|\bpregnant\b|\bgarbhwati\b|\bdiarrh|\bulti\b|\bdast\b|\binsulin\b|\bhospital\b|\bpills?\b/i,
+  shelter: /तिरपाल|त्रिपाल|ऊँची जगह|ऊंची जगह|टेंट|\btent\b|\btirpal\b|\bshelter\b|\bunchi jagah\b|\bcamp\b|\brehne (ke liye|ki jagah)\b|\bsone ki jagah\b|\bjagah nahi\b|\bbahar so\b|\bkhule (aasman|me)\b|\bsir chhupane\b|\bhomeless\b|\brelief camp\b|\bbeghar\b/i,
 }
 
 const VUL =

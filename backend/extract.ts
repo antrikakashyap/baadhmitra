@@ -2,7 +2,7 @@ import type { SQSBatchResponse, SQSEvent } from 'aws-lambda'
 import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime'
 import { PublishCommand } from '@aws-sdk/client-sns'
 import { PutCommand } from '@aws-sdk/lib-dynamodb'
-import { TBL, bump, ddb, emf, env, getInc, putInc, sns } from './lib/aws'
+import { TBL, bump, ddb, emf, env, getInc, log, putInc, sns } from './lib/aws'
 import type { Msg } from './ingest'
 import { SYS, check, pick, prompt, rulex } from '../shared/extract'
 import { merge } from '../shared/score'
@@ -99,7 +99,10 @@ async function one(m: Msg): Promise<void> {
               Message: `Priority ${inc.score}/100 near ${inc.place}. ${inc.n} independent reporters, up to ${inc.ppl} people at risk. Needs: ${inc.needs.join(', ') || 'unspecified'}.`,
             }),
           )
-          .catch(() => emf('AlertError', 1))
+          .catch((err) => {
+            emf('AlertError', 1)
+            log('warn', 'alert_failed', { rid: m.id, inc: inc.id, err: (err as Error).name })
+          })
       }
       return
     }
@@ -113,10 +116,13 @@ export const handler = async (e: SQSEvent): Promise<SQSBatchResponse> => {
   const fail: SQSBatchResponse['batchItemFailures'] = []
   await Promise.all(
     e.Records.map(async (r) => {
+      let rid: string | undefined
       try {
-        await one(JSON.parse(r.body) as Msg)
+        const m = JSON.parse(r.body) as Msg
+        rid = m.id
+        await one(m)
       } catch (err) {
-        console.error('record failed', r.messageId, err)
+        log('error', 'record_failed', { rid, messageId: r.messageId, err: (err as Error).message })
         fail.push({ itemIdentifier: r.messageId })
       }
     }),
